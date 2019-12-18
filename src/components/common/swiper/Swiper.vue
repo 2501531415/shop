@@ -50,7 +50,7 @@
 
         // 2.开启定时器
         this.startTimer();
-      }, 100)
+      }, 500)
     },
     methods: {
 		  /**
@@ -240,6 +240,6 @@
   }
 
   .indi-item.active {
-    background-color: rgba(212,62,46,1.0);
+    background-color: rgb(218, 67, 50);
   }
 </style>

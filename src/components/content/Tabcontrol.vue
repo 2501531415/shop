@@ -18,6 +18,7 @@ data(){
 methods: {
     change(index){
         this.currentIndex = index
+        this.$emit("btnclick",index)
     }
 },
 
@@ -36,6 +37,7 @@ props: {
     font-size: 14px;
     text-align: center;
     background-color: #fff;
+    z-index: 999;
 }
 .tab-control-item{
      display:flex;

@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --open --host 172.16.114.42",
+    "serve": "vue-cli-service serve ",
     "build": "vue-cli-service build"
   },
   "dependencies": {
     "axios": "^0.19.0",
+    "better-scroll": "^1.15.2",
     "core-js": "^3.4.3",
     "git": "^0.1.5",
     "vue": "^2.6.10",
