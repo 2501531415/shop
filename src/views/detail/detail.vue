@@ -1,73 +1,60 @@
 <template>
 <div class="detail">
-     <detail-nav/>
+     <detail-nav @btnclick="btnclick" ref="nav"/>
   <scroll class="content" 
         :probeType="3"
-        @scrollPosition="position"
-        :pullUpLoad="true" ref="scroll">    
-    <detail-swiper/>
+        :pullUpLoad="true" ref="scroll" @scrollPosition="currentPosition">    
+    <detail-swiper :img="topImages"/>
     <detail-base :goods="goodsInfo"/>
-    <detail-shop :shops="shops"/>
-    <ul>
-        <li>iii1</li>
-        <li>iii2</li>
-        <li>iii3</li>
-        <li>iii4</li>
-        <li>iii5</li>
-        <li>iii6</li>
-        <li>iii7</li>
-        <li>iii8</li>
-        <li>iii9</li>
-        <li>iii10</li>
-        <li>iii11</li>
-        <li>iii12</li>
-        <li>iii13</li>
-        <li>iii14</li>
-        <li>iii15</li>
-        <li>iii16</li>
-        <li>iii17</li>
-        <li>iii18</li>
-        <li>iii19</li>
-        <li>iii20</li>
-    </ul>
+    <detail-shop :shops="shopInfo"/>
+    <detail-good :good="goods"  @imageLoad="imageLoad"/>
+    <detail-params :params="paramInfo" ref="params" />
+    <detail-comment :comment="comment" ref="comment" />
+    <goods-list :goods="recommend" ref="recommend" />
+
   </scroll>
-  
+      <back-top @click.native="backtop" :class="{active:isshow}"></back-top>
+    <detail-bottom @addCart="addCart"/>
+  <toast :message="message" :isshow="isshow1"/>
 </div>
 </template>
 <script>
- import {getDetailData,Goods,Shop} from 'network/detail.js'
+ import {getDetailData,Goods,Shop,GoodsParam,getDetailRecommend} from 'network/detail.js'
  import detailNav from './children/detailNav.vue'
  import detailSwiper from './children/detailSwiper.vue'
  import detailBase from './children/detailBase.vue'
  import detailShop from './children/detailShop.vue'
  import Scroll from 'components/common/scroll/scroll'
+ import detailGood from './children/detailGoods'
+ import detailParams from './children/detailParams'
+ import detailComment from './children/detailComment.vue'
+ import detailRecommend from './children/detailRecomment.vue'
+ import goodsList from 'components/content/goods/goodsList.vue'
+ import detailBottom from './children/detailBottom.vue'
+ import {debounce} from 'common/utils.js'
+ import {mixin} from 'common/mixin.js'
+ import toast from 'components/common/toast/toast.vue'
+ 
+ 
 export default {
 
 name: 'detail',
+mixins: [mixin],
 data(){
     return {
         id:'',
+        topImages:[],
         goodsInfo:{},
-        shops:{},
-        itemInfo:[
-            {
-            title:'【仲陌美】2018春秋季新款风长袖T恤 上衣大地',
-            price:38.50,
-            oldPrice:69.00,
-            discountDesc:1500,
-            },
-        ],
-        shopMessage:{
-            imageUrl:'',
-            name:'仲陌美',
-            total:5.8,
-            product:99,
-            state:4.64,
-            price:5,
-            mass:4.62
-        },
-        columns:33,
-        serveices:'72小时发货',
+        shopInfo:{},
+        goods:{},
+        paramInfo:{},
+        comment:[],
+        recommend:[],
+        itemTopY:[],
+        getItemY:null,
+        currentIndex:0,
+        message:'',
+        isshow1:''
     }
 },
 components: {
@@ -75,24 +62,93 @@ components: {
     detailSwiper,
     detailBase,
     detailShop,
-    Scroll
+    Scroll,
+    detailGood,
+    detailParams,
+    detailComment,
+    goodsList,
+    detailBottom,
+    toast
+    
 },
 created () {
-    // this.id = this.$route.params.id
-  const goods= new Goods(this.itemInfo[0],this.columns,this.serveices)
-  this.goodsInfo = goods
-  
-  const shop = new Shop(this.shopMessage)
-  this.shops = shop
-  console.log(this.shops)
+    this.id = this.$route.params.iid
+    getDetailData(this.id).then(res =>{
+        // 获取轮播图 
+        this.topImages = res.result.itemInfo.topImages
+        
+          //获取商品基本信息
+        this.goodsInfo = new Goods(res.result.itemInfo,res.result.columns, res.result.shopInfo.services)
+        // console.log(res)
+        // console.log(this.goodsInfo)
+        // 获取商铺信息
+        this.shopInfo = new Shop(res.result.shopInfo)
+        // console.log(res)
+        // 详情
+        this.goods = res.result.detailInfo
+        // 参数
+        this.paramInfo = new GoodsParam(res.result.itemParams.info, res.result.itemParams.rule)
+
+        // 评论
+        this.comment = res.result.rate.list
+        this.getItemY = debounce(()=>{
+        this.itemTopY.push(0)
+        this.itemTopY.push(this.$refs.params.$el.offsetTop)
+        this.itemTopY.push(this.$refs.comment.$el.offsetTop)
+        this.itemTopY.push(this.$refs.recommend.$el.offsetTop)
+        this.itemTopY.push(Number.MAX_VALUE)
+        },100)
+
+    })
+    
+
+    getDetailRecommend().then(res=>{
+        this.recommend = res.data.list
+        // console.log(res.data.list)
+    })
+
 },
 mounted () {
-    console.log(this.$refs.scroll.bs)
+      
+},
+updated () {
+       
+
+        // console.log(this.itemTopY)
 },
 methods: {
-    position(position){
-        console.log(position)
-    }
+    addCart(){
+        const product={}
+        product.img = this.topImages[0],
+        product.name = this.goodsInfo.title,
+        product.desc = this.goodsInfo.desc
+        product.price = this.goodsInfo.realPrice
+        product.iid = this.id
+        
+        this.$store.dispatch('addCart',product).then(res=>{
+            this.$toast.show(res,1000)
+        })
+
+    },
+   imageLoad(){
+    this.$refs.scroll.refresh()
+    this.getItemY()
+   },
+   btnclick(index){
+        this.$refs.scroll.bs.scrollTo(0,-this.itemTopY[index],200)
+   },
+   currentPosition(position){
+       this.isshow = -position.y < 1000
+       const positionY = -position.y
+        const length =this.itemTopY.length
+       for(let i=0;i<length-1;i++){
+        if(this.currentIndex !== i && (positionY >= this.itemTopY[i] && positionY<this.itemTopY[i+1])){
+            this.currentIndex = i 
+            this.$refs.nav.currentIndex = this.currentIndex
+        }
+        
+       }
+   }
 }
 }
 
@@ -106,5 +162,8 @@ methods: {
 }
 .content{
     height: calc(100vh - 44px);
+}
+.active{
+    display: none
 }
 </style>

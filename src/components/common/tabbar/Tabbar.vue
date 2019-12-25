@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-<div id="tabbar">
+<div class="tabbar">
   <slot></slot>
 </div>
 </div>
@@ -11,7 +11,7 @@ name: 'Tabbar'
 }
 </script>
 <style scoped>
-#tabbar{
+.tabbar{
   display:flex;
    height: 49px;
   background-color:#f6f6f6;

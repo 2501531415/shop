@@ -1,9 +1,9 @@
 <template>
 <div class="goods-list" @click="itemback">
-<img :src="goodsitem.show.img" alt="" @load="imgLoad">
+<img v-lazy="showImage" alt="" @load="imgLoad">
 <div class="message">
     <p class="text">{{goodsitem.title}}</p>
-    <span class="price">{{goodsitem.price}}</span>
+    <span class="price">￥{{goodsitem.price}}</span>
     <span class="cfav">{{goodsitem.cfav}}</span>
 </div>
 </div>
@@ -19,12 +19,18 @@ props: {
         }
     }
 },
+computed: {
+  showImage(){
+      return this.goodsitem.image || this.goodsitem.show.img
+  }  
+},
 methods: {
     imgLoad(){
         this.$bus.$emit('itemImageLoad')
     },
     itemback(){
         this.$router.push('/detail/' + this.goodsitem.iid)
+        
     }
 }
 }

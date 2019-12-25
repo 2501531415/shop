@@ -46,7 +46,8 @@ data(){
         isshow:true,
         currentTabControl:'',
         istop:false,
-        saveY:''
+        saveY:'',
+        itemListen:null
 
     }
 },
@@ -83,11 +84,18 @@ mounted () {
    
 },
 activated () {
-    this.$refs.scroll.scrollTo(0,this.saveY,0)
+    this.$refs.scroll.scrollTo(0,this.saveY)
+    // console.log(this.$refs.scroll.bs)
+    // console.log(this.saveY)
     this.$refs.scroll.refresh()
+    // console.log("我已经进入了")
+
 },
 deactivated () {
     this.saveY = this.$refs.scroll.bs.y
+    // console.log("我已经出去")
+    // console.log(this.saveY)
+
 },
 methods: {
     //调用的方法

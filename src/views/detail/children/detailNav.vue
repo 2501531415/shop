@@ -21,10 +21,14 @@ data () {
 },
 methods: {
     back(){
-        this.$router.back(-1)
+        this.$router.back()
+        // this.$router.push('/home')
     },
     backItem(index){
         this.currentIndex = index
+        if(this.currentIndex == index){
+        this.$emit('btnclick',index)
+        }
     }
 },
 components: {

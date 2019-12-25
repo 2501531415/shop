@@ -34,7 +34,7 @@ mounted () {
   this.bs = new BScroll(this.$refs.wrapper, {
       probeType:this.probeType,
       click:this.click,
-      pullUpLoad:this.pullUpLoad
+      pullUpLoad:this.pullUpLoad,
 })
   if(this.probeType == 2 || this.probeType == 3){
         this.bs.on('scroll',(position)=>{

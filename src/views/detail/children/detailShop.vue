@@ -1,33 +1,23 @@
 <template>
 <div class="detailShop">
     <div class="nav">
-        <img src="~assets/img/home/logo.jpg" alt="">
+        <img :src="shops.logo" alt="">
         <span class="name">{{shops.name}}</span>
     </div>
     <div class="message">
-        <div class="total">{{shops.total}}万
+        <div class="total">{{shops.sells}}
         <p>总销量</p>  
         </div>
-        <div class="product">{{shops.product}}
+        <div class="product">{{shops.goodsCount}}
         <p>全部宝贝</p>  
         </div>
         <div class="line"></div>
-       <div class="info">
+       <div class="shop-middle-right">
             <table>
-            <tr>
-                <td>描述推荐</td>
-                <td class="state">{{shops.state}}</td>
-                <td><span class="active">低</span></td>
-            </tr>
-            <tr>
-                <td>价格合理</td>
-                <td class="state">{{shops.price}}</td>
-                <td><span class="active">低</span></td>
-            </tr>
-            <tr>
-                <td>质量满意</td>
-                <td  class="state2">{{shops.mass}}</td>
-                <td><span class="active2">高</span></td>
+            <tr v-for="(item,index) in shops.score" :key="index">
+                <td>{{item.name}}</td>
+                <td class="score" :class="{'score-better': item.isBetter}">{{item.score}}</td>
+            <td class="better" :class="{'better-more': item.isBetter}"><span>{{item.isBetter ? '高':'低'}}</span></td>
             </tr>
         </table>
        </div>
@@ -35,7 +25,6 @@
      <div class="shop-bottom">
       <div class="enter-shop">进店逛逛</div>
     </div>
-
 </div>
 
 </template>
@@ -62,7 +51,11 @@ props: {
     padding-left: 5px;
 }
 .nav img{
-    vertical-align: middle
+    vertical-align: middle;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgb(0, 0, 0,.1)
 }
 .nav .name{
     padding-left: 10px
@@ -86,34 +79,32 @@ props: {
     display:flex;
     justify-content: space-around
 }
-.state{
-    color: aquamarine;
+  .shop-middle-right table {
+    width: 120px;
+    margin-left: 30px;
+  }
 
-}
-.active{
-    width: 16px;
-    height: 18px;
-    background-color: aquamarine;
-    color: white
+  .shop-middle-right table td {
+    padding: 5px 0;
+  }
 
-}
-.state2{
-    color: red;
+  .shop-middle-right .score {
+    color: #5ea732;
+  }
 
-}
-.active2{
-    width: 16px;
-    height: 18px;
-    background-color: red;
-    color: white
-}
+  .shop-middle-right .score-better {
+    color: #f13e3a;
+  }
 
-.info table {
-    width: 120px
-}
-.info table tr td{
-    padding: 5px 0px
-}
+  .shop-middle-right .better span {
+    background-color: #5ea732;
+    color: #fff;
+    text-align: center;
+  }
+
+  .shop-middle-right .better-more span {
+    background-color: #f13e3a;
+  }
   .shop-bottom {
     text-align: center;
     margin-top: 10px;
